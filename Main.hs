@@ -39,8 +39,8 @@ procConnection connSock = do
     IO.hSetBuffering connHandle IO.LineBuffering
     messages <- IO.hGetContents connHandle
     findEmptyLine (lines messages)
-    IO.hPutStrLn connHandle "HTTP/1.1 301 Moved Permanently"
-    IO.hPutStrLn connHandle "Location: http://www.google.com"
+    IO.hPutStrLn connHandle "HTTP/1.1 303 See Other"
+    IO.hPutStrLn connHandle "Location: http://www.google.de/search?q=FLUPILUPI"
     IO.hPutStrLn connHandle ""
     IO.hClose connHandle
     putStrLn "END"
