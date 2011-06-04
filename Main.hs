@@ -34,8 +34,16 @@ procConnections masterSock =
 
 procConnection :: NS.Socket -> IO ()
 procConnection connSock = do
-    connHandle <- NS.socketToHandle connSock IO.ReadMode
+    putStrLn "BEGIN"
+    connHandle <- NS.socketToHandle connSock IO.ReadWriteMode
     IO.hSetBuffering connHandle IO.LineBuffering
     messages <- IO.hGetContents connHandle
-    mapM_ putStrLn (lines messages)
+    findEmptyLine (lines messages)
+    IO.hPutStrLn connHandle "HTTP/1.1 301 Moved Permanently"
+    IO.hPutStrLn connHandle "Location: http://www.google.com"
+    IO.hPutStrLn connHandle ""
     IO.hClose connHandle
+    putStrLn "END"
+        where findEmptyLine [] = return ()
+              findEmptyLine (l:ls) | l == "\r" = return ()
+                                   | otherwise = putStrLn l >> findEmptyLine ls
