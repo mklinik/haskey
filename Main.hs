@@ -9,6 +9,7 @@ import qualified Control.Exception as CE
 import qualified System.IO as IO
 
 import qualified Haskey as H
+import qualified HTTP.HTTP as HHTTP
 
 serverMain :: String       -- ^ port number
            -> IO ()
@@ -38,12 +39,16 @@ procConnection connSock = do
     connHandle <- NS.socketToHandle connSock IO.ReadWriteMode
     IO.hSetBuffering connHandle IO.LineBuffering
     messages <- IO.hGetContents connHandle
-    findEmptyLine (lines messages)
-    IO.hPutStrLn connHandle "HTTP/1.1 303 See Other"
-    IO.hPutStrLn connHandle "Location: http://www.google.de/search?q=FLUPILUPI"
-    IO.hPutStrLn connHandle ""
+    let answer = answerQuery $ lines messages
+    IO.hPutStr connHandle answer
     IO.hClose connHandle
     putStrLn "END"
-        where findEmptyLine [] = return ()
-              findEmptyLine (l:ls) | l == "\r" = return ()
-                                   | otherwise = putStrLn l >> findEmptyLine ls
+
+findEmptyLine [] = return ()
+findEmptyLine (l:ls) | l == "\r" = return ()
+                     | otherwise = putStrLn l >> findEmptyLine ls
+
+answerQuery :: [String] -> String
+answerQuery (x:xs) = case HHTTP.parseGetRequest x of
+    Just _ -> "HTTP/1.1 303 See Other\r\nLocation: http://www.google.de/search?q=FLUPILUPI\r\n\r\n"
+    Nothing -> "HTTP/1.1 200 Ok\r\nConnection: close\r\n\r\n<html><head></head><body><h1>haskey</h1><p>by mkl, 2011</p><form action=\"/\" method=\"get\"><input name=\"q\" type=\"text\"/></form></body></html>"

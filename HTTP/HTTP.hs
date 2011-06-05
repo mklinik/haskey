@@ -1,6 +1,7 @@
-module Haskey.HTTP where
+module HTTP.HTTP where
 
 import qualified Data.String.Utils as SU
+import qualified Data.List as L
 
 -- splits the GET line of a HTTP request into cgi parameters and values
 -- performs NO url decoding
@@ -12,10 +13,13 @@ parseGetRequest req = let parts = words req in
         else Nothing
 
 parseUrl :: String -> Maybe [(String, String)]
-parseUrl url = let xs = concat $ map (SU.split "=") $ SU.split "&" ((SU.split "?" url) !! 1) in
-    if length xs `mod` 2 == 1
-        then Nothing
-        else Just $ zip (evenIndexes xs) (oddIndexes xs)
+parseUrl url = if "?" `L.isInfixOf` url
+    then let xs = concat $ map (SU.split "=") $ SU.split "&" ((SU.split "?" url) !! 1) in
+         if length xs `mod` 2 == 1
+             then Nothing
+             else Just $ zip (evenIndexes xs) (oddIndexes xs)
+    else
+        Nothing
 
 oddIndexes :: [a] -> [a]
 oddIndexes xs = oddIndexes' xs 0
