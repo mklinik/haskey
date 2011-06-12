@@ -49,7 +49,8 @@ config =
     [ ("g", "http://www.google.com/search?q=")
     , ("y", "http://de.search.yahoo.com/search?p=")
     , ("yt", "http://www.youtube.com/results?search_query=")
-    , ("d", "http://dict.leo.org/ende?lp=ende&lang=de&searchLoc=0&cmpType=relaxed&sectHdr=on&spellToler=&search=")
+    , ("d", "http://dict.leo.org/?search=")
+    , ("h", "http://www.haskell.org/hoogle/?hoogle=")
     ]
 
 splitAtFirstWS :: String -> Maybe (String, String)
