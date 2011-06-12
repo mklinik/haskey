@@ -47,6 +47,7 @@ mapURL url =
 config :: [(String, String)]
 config =
     [ ("g", "http://www.google.com/search?q=")
+    , ("gm", "http://maps.google.de/maps?q=")
     , ("y", "http://de.search.yahoo.com/search?p=")
     , ("yt", "http://www.youtube.com/results?search_query=")
     , ("d", "http://dict.leo.org/?search=")
