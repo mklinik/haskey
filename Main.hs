@@ -51,6 +51,7 @@ config =
     , ("yt", "http://www.youtube.com/results?search_query=")
     , ("d", "http://dict.leo.org/?search=")
     , ("h", "http://www.haskell.org/hoogle/?hoogle=")
+    , ("ex", "https://addons.mozilla.org/en-US/firefox/search?q=")
     ]
 
 splitAtFirstWS :: String -> Maybe (String, String)
