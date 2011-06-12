@@ -52,6 +52,8 @@ config =
     , ("d", "http://dict.leo.org/?search=")
     , ("h", "http://www.haskell.org/hoogle/?hoogle=")
     , ("ex", "https://addons.mozilla.org/en-US/firefox/search?q=")
+    , ("wd", "http://de.wikipedia.org/wiki/Spezial:Search?search=")
+    , ("w", "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=")
     ]
 
 splitAtFirstWS :: String -> Maybe (String, String)
