@@ -20,14 +20,12 @@ server port = N.withSocketsDo $ do
     (NS.sClose)
     (\socket -> CM.forever $ do
         (clientSocket, addr) <- NS.accept socket
-        print addr
         c <- HTTP.socketConnection "" clientSocket :: IO (HTTP.HandleStream L.ByteString)
         request <- HTTP.receiveHTTP c
         case request of
           Right x -> do
             case mapURL $ HTTP.rqURI x of
               Just url -> do
-                putStrLn $ "redirecting to: " ++ (show url)
                 HTTP.respondHTTP c $ HTTP.Response (3, 0, 3) "See Other" [(HTTP.Header HTTP.HdrLocation url)] ""
               Nothing  -> do
                 HTTP.respondHTTP c $ HTTP.Response (2, 0, 0) "Ok" [] defaultAnswer
@@ -77,6 +75,7 @@ solConfig =
 configs :: [(String, Config)]
 configs = [("mkl", mklConfig), ("sol", solConfig)]
 
+-- when there is no config with that name in configs, use defaultConfig
 lookupConfig :: [(String, String)] -> Config
 lookupConfig nameValues =
     case lookup "c" nameValues >>= (flip lookup) configs of
