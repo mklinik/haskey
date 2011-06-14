@@ -12,7 +12,7 @@ import qualified Control.Exception as CE
 import qualified Data.Char as DC
 
 
-defaultAnswer = "<html><head></head><body><h1>haskey</h1><p>by mkl, 2011</p><form action=\"/\" method=\"get\"><input name=\"q\" type=\"text\"/></form></body></html>"
+defaultAnswer = "<html><head></head><body><h1>haskey</h1><p>by mkl, 2011</p><form action=\"/\" method=\"get\"><input name=\"q\" type=\"text\"/><input name=\"c\" type=\"text\"/><input type=\"submit\" name=\"mysubmit\" value=\"Submit\" /></form></body></html>"
 
 server port = N.withSocketsDo $ do
   CE.bracket
@@ -41,11 +41,13 @@ mapURL url =
     in do
         query <- lookup "q" nameValues
         (keyword, realQuery) <- splitAtFirstWS query
-        item <- lookup keyword config
+        item <- lookup keyword $ lookupConfig nameValues
         return $ item ++ (CGI.urlEncode realQuery)
 
-config :: [(String, String)]
-config =
+type Config = [(String, String)]
+
+defaultConfig :: Config
+defaultConfig =
     [ ("g", "http://www.google.com/search?q=")
     , ("gm", "http://maps.google.de/maps?q=")
     , ("y", "http://de.search.yahoo.com/search?p=")
@@ -58,6 +60,26 @@ config =
     , ("osm", "http://www.openstreetmap.org/?query=")
     , ("h", "http://www.haskell.org/hoogle/?hoogle=")
     ]
+
+mklConfig :: Config
+mklConfig =
+    [ ("g", "http://de.search.yahoo.com/search?p=")
+    ]
+
+solConfig :: Config
+solConfig =
+    [ ("g", "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=")
+    ]
+
+-- configs is an association list
+configs :: [(String, Config)]
+configs = [("mkl", mklConfig), ("sol", solConfig)]
+
+lookupConfig :: [(String, String)] -> Config
+lookupConfig nameValues =
+    case lookup "c" nameValues >>= (flip lookup) configs of
+        Just c -> c
+        Nothing -> defaultConfig
 
 splitAtFirstWS :: String -> Maybe (String, String)
 splitAtFirstWS s = case break DC.isSpace s of
