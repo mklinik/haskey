@@ -63,8 +63,10 @@ defaultConfig =
 
 mklConfig :: Config
 mklConfig =
-    [ ("g", "http://de.search.yahoo.com/search?p=")
-    ]
+    [ ("gh", "https://github.com/search?type=Everything&q=")
+    , ("ft", "http://www.filestube.com/search.html?select=All&q=")
+    , ("gd", "http://www.google.de/search?q=")
+    ] ++ defaultConfig
 
 solConfig :: Config
 solConfig =
