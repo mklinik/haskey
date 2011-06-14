@@ -56,6 +56,7 @@ config =
     , ("wd", "http://de.wikipedia.org/wiki/Spezial:Search?search=")
     , ("w", "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=")
     , ("osm", "http://www.openstreetmap.org/?query=")
+    , ("h", "http://www.haskell.org/hoogle/?hoogle=")
     ]
 
 splitAtFirstWS :: String -> Maybe (String, String)
