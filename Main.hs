@@ -14,6 +14,8 @@ import qualified Data.Char as DC
 
 defaultAnswer = "<html><head></head><body><h1>haskey</h1><p>by mkl, 2011</p><form action=\"/\" method=\"get\"><input name=\"q\" type=\"text\"/><input name=\"c\" type=\"text\"/><input type=\"submit\" name=\"mysubmit\" value=\"Submit\" /></form></body></html>"
 
+main = server 8080
+
 server port = N.withSocketsDo $ do
   CE.bracket
     (N.listenOn $ N.PortNumber port)
