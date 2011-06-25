@@ -25,8 +25,7 @@ Currently, you have to run your own instance of Haskey in order to use it.
 
         $ git clone https://github.com/mklinik/haskey.git
         $ cd haskey
-        $ ghci Main.hs 
-        *Main> server 8080
+        $ runhaskell Main.hs
 
 1. Configure your browser to use Haskey as the default search engine:
 
