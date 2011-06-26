@@ -10,6 +10,7 @@ import qualified Network.HTTP as HTTP
 import qualified Data.ByteString.Lazy.Char8 as L
 import qualified Control.Exception as CE
 import qualified Data.Char as DC
+import Text.Regex (mkRegex, subRegex)
 
 
 defaultAnswer = "<html><head></head><body><h1>haskey</h1><p>by mkl, 2011</p><form action=\"/\" method=\"get\"><input name=\"q\" type=\"text\"/><input name=\"c\" type=\"text\"/><input type=\"submit\" name=\"mysubmit\" value=\"Submit\" /></form></body></html>"
@@ -42,35 +43,35 @@ mapURL url =
         query <- lookup "q" nameValues
         (keyword, realQuery) <- splitAtFirstWS query
         item <- lookup keyword $ lookupConfig nameValues
-        return $ item ++ (CGI.urlEncode realQuery)
+        return $ subRegex (mkRegex "%s") item (CGI.urlEncode realQuery)
 
 type Config = [(String, String)]
 
 defaultConfig :: Config
 defaultConfig =
-    [ ("g", "http://www.google.com/search?q=")
-    , ("gm", "http://maps.google.de/maps?q=")
-    , ("y", "http://de.search.yahoo.com/search?p=")
-    , ("yt", "http://www.youtube.com/results?search_query=")
-    , ("d", "http://dict.leo.org/?search=")
-    , ("h", "http://www.haskell.org/hoogle/?hoogle=")
-    , ("ex", "https://addons.mozilla.org/en-US/firefox/search?q=")
-    , ("wd", "http://de.wikipedia.org/wiki/Spezial:Search?search=")
-    , ("w", "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=")
-    , ("osm", "http://www.openstreetmap.org/?query=")
-    , ("h", "http://www.haskell.org/hoogle/?hoogle=")
+    [ ("g", "http://www.google.com/search?q=%s")
+    , ("gm", "http://maps.google.de/maps?q=%s")
+    , ("y", "http://de.search.yahoo.com/search?p=%s")
+    , ("yt", "http://www.youtube.com/results?search_query=%s")
+    , ("d", "http://dict.leo.org/?search=%s")
+    , ("h", "http://www.haskell.org/hoogle/?hoogle=%s")
+    , ("ex", "https://addons.mozilla.org/en-US/firefox/search?q=%s")
+    , ("wd", "http://de.wikipedia.org/wiki/Spezial:Search?search=%s")
+    , ("w", "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=%s")
+    , ("osm", "http://www.openstreetmap.org/?query=%s")
+    , ("h", "http://www.haskell.org/hoogle/?hoogle=%s")
     ]
 
 mklConfig :: Config
 mklConfig =
-    [ ("gh", "https://github.com/search?type=Everything&q=")
-    , ("ft", "http://www.filestube.com/search.html?select=All&q=")
-    , ("gd", "http://www.google.de/search?q=")
+    [ ("gh", "https://github.com/search?type=Everything&q=%s")
+    , ("ft", "http://www.filestube.com/search.html?select=All&q=%s")
+    , ("gd", "http://www.google.de/search?q=%s")
     ] ++ defaultConfig
 
 solConfig :: Config
 solConfig =
-    [ ("g", "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=")
+    [ ("g", "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=%s")
     ]
 
 -- configs is an association list
