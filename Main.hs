@@ -23,6 +23,7 @@ server port = N.withSocketsDo $ do
     (NS.sClose)
     (\socket -> CM.forever $ do
         (clientSocket, addr) <- NS.accept socket
+        print addr
         c <- HTTP.socketConnection "" clientSocket :: IO (HTTP.HandleStream L.ByteString)
         request <- HTTP.receiveHTTP c
         case request of
