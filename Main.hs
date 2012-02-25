@@ -24,7 +24,7 @@ server port = N.withSocketsDo $ do
     (\socket -> CM.forever $ do
         (clientSocket, addr) <- NS.accept socket
         print addr
-        c <- HTTP.socketConnection "" clientSocket :: IO (HTTP.HandleStream L.ByteString)
+        c <- HTTP.socketConnection "" 0 clientSocket :: IO (HTTP.HandleStream L.ByteString)
         request <- HTTP.receiveHTTP c
         case request of
           Right x -> do
