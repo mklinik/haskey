@@ -28,23 +28,19 @@ server port = N.withSocketsDo $ do
       request <- HTTP.receiveHTTP c
       case request of
         Right req -> do
-          case makeURL $ HTTP.rqURI req of
-            Just url -> do
+          let url = makeURL $ HTTP.rqURI req in
               HTTP.respondHTTP c $ HTTP.Response (3, 0, 3) "See Other" [(HTTP.Header HTTP.HdrLocation url)] ""
-            Nothing  -> do
-              HTTP.respondHTTP c $ HTTP.Response (2, 0, 0) "Ok" [] defaultAnswer
         Left err -> print err
       HTTP.close c
     )
 
-makeURL :: NU.URI -> Maybe String
-makeURL url =
-  let nameValues = (CGI.formDecode $ dropWhile (=='?') $ NU.uriQuery url)
-  in do
-    query <- lookup "q" nameValues
-    (keyword, realQuery) <- splitAtFirstWS query
-    (prefix,suffix) <- lookup keyword defaultConfig
-    return $ prefix ++ (CGI.urlEncode realQuery) ++ suffix
+makeURL :: NU.URI -> String
+makeURL url = prefix ++ (CGI.urlEncode realQuery) ++ suffix
+  where
+    nameValues = (CGI.formDecode $ dropWhile (=='?') $ NU.uriQuery url)
+    query = maybe "" id (lookup "q" nameValues)
+    (keyword, realQuery) = maybe ("", query) id (splitAtFirstWS query)
+    (prefix,suffix) = maybe ("https://www.startpage.com/do/search?query=","") id (lookup keyword defaultConfig)
 
 -- First entry is keyword
 -- Second and third entries are prefix and suffix of search url
@@ -52,27 +48,19 @@ type Config = [(String, (String, String))]
 
 defaultConfig :: Config
 defaultConfig =
-  [ ("gg", ("http://www.google.com/search?q=",""))
-  , ("g", ("https://www.startpage.com/do/search?query=",""))
-  -- , ("gm", "http://maps.google.de/maps?q=%s")
-  -- , ("y", "http://de.search.yahoo.com/search?p=%s")
-  -- , ("yt", "http://www.youtube.com/results?search_query=%s")
-  -- , ("d", "http://dict.leo.org/?search=%s")
-  -- , ("h", "http://www.haskell.org/hoogle/?hoogle=%s")
-  -- , ("ex", "https://addons.mozilla.org/en-US/firefox/search?q=%s")
-  -- , ("wd", "http://de.wikipedia.org/wiki/Spezial:Search?search=%s")
-  -- , ("w", "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=%s")
-  -- , ("osm", "http://www.openstreetmap.org/?query=%s")
-  -- , ("h", "http://www.haskell.org/hoogle/?hoogle=%s")
-  -- , ("sp", "https://www.startpage.com/do/search?query=%s")
-  -- , ("en", "http://www.encyclo.nl/begrip/%s")
-  -- , ("denl", "http://m.dict.cc/denl/?s=%s")
+  [ ("g",   ("https://www.startpage.com/do/search?query=",""))
+  , ("osm", ("http://www.openstreetmap.org/?query=",""))
+  , ("yt",  ("http://www.youtube.com/results?search_query=",""))
+  , ("h",   ("http://www.haskell.org/hoogle/?hoogle=",""))
+  , ("en",  ("http://www.encyclo.nl/begrip/",""))
+  , ("dn",  ("http://m.dict.cc/denl/?s=",""))
+  , ("d",   ("http://m.dict.cc/deen/?s=",""))
+  , ("ud",  ("http://www.urbandictionary.com/define.php?term=",""))
+  , ("w",   ("https://en.wikipedia.org/w/index.php?search=","&title=Special%3ASearch&fulltext=1"))
+  , ("wd",  ("https://de.wikipedia.org/wiki/Spezial:Suche/",""))
+  , ("wn",  ("https://nl.wikipedia.org/wiki/Special:Search?search=",""))
+  , ("gg",  ("http://www.google.com/search?q=",""))
   ]
-
--- urbandictionary
--- openstreetmap
--- dict.cc denl deen
--- wikipedia de nl en
 
 splitAtFirstWS :: String -> Maybe (String, String)
 splitAtFirstWS s = case break DC.isSpace s of
