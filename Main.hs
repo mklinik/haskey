@@ -13,7 +13,7 @@ import qualified Data.Char as DC
 import Text.Regex (mkRegex, subRegex)
 
 
-defaultAnswer = "<html><head></head><body><h1>haskey</h1><p>by mkl, 2011</p><form action=\"/\" method=\"get\"><input name=\"q\" type=\"text\"/><input name=\"c\" type=\"text\"/><input type=\"submit\" name=\"mysubmit\" value=\"Submit\" /></form></body></html>"
+defaultAnswer = "<html><head></head><body><h1>haskey</h1><p>by mkl, 2011-2017</p><form action=\"/\" method=\"get\"><input name=\"q\" type=\"text\"/><input type=\"submit\" name=\"mysubmit\" value=\"Submit\" /></form></body></html>"
 
 main = server 8080
 
