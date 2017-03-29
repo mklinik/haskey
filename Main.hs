@@ -27,8 +27,8 @@ server port = N.withSocketsDo $ do
         c <- HTTP.socketConnection "" 0 clientSocket :: IO (HTTP.HandleStream L.ByteString)
         request <- HTTP.receiveHTTP c
         case request of
-          Right x -> do
-            case mapURL $ HTTP.rqURI x of
+          Right req -> do
+            case makeURL $ HTTP.rqURI req of
               Just url -> do
                 HTTP.respondHTTP c $ HTTP.Response (3, 0, 3) "See Other" [(HTTP.Header HTTP.HdrLocation url)] ""
               Nothing  -> do
@@ -37,33 +37,36 @@ server port = N.withSocketsDo $ do
         HTTP.close c
     )
 
-mapURL :: NU.URI -> Maybe String
-mapURL url =
+makeURL :: NU.URI -> Maybe String
+makeURL url =
     let nameValues = (CGI.formDecode $ dropWhile (=='?') $ NU.uriQuery url)
     in do
         query <- lookup "q" nameValues
         (keyword, realQuery) <- splitAtFirstWS query
-        item <- lookup keyword defaultConfig
-        return $ subRegex (mkRegex "%s") item (CGI.urlEncode realQuery)
+        (prefix,suffix) <- lookup keyword defaultConfig
+        return $ prefix ++ (CGI.urlEncode realQuery) ++ suffix
 
-type Config = [(String, String)]
+-- First entry is keyword
+-- Second and third entries are prefix and suffix of search url
+type Config = [(String, (String, String))]
 
 defaultConfig :: Config
 defaultConfig =
-    [ ("g", "http://www.google.com/search?q=%s")
-    , ("gm", "http://maps.google.de/maps?q=%s")
-    , ("y", "http://de.search.yahoo.com/search?p=%s")
-    , ("yt", "http://www.youtube.com/results?search_query=%s")
-    , ("d", "http://dict.leo.org/?search=%s")
-    , ("h", "http://www.haskell.org/hoogle/?hoogle=%s")
-    , ("ex", "https://addons.mozilla.org/en-US/firefox/search?q=%s")
-    , ("wd", "http://de.wikipedia.org/wiki/Spezial:Search?search=%s")
-    , ("w", "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=%s")
-    , ("osm", "http://www.openstreetmap.org/?query=%s")
-    , ("h", "http://www.haskell.org/hoogle/?hoogle=%s")
-    , ("sp", "https://www.startpage.com/do/search?query=%s")
-    , ("en", "http://www.encyclo.nl/begrip/%s")
-    , ("denl", "http://m.dict.cc/denl/?s=%s")
+    [ ("gg", ("http://www.google.com/search?q=",""))
+    , ("g", ("https://www.startpage.com/do/search?query=",""))
+    -- , ("gm", "http://maps.google.de/maps?q=%s")
+    -- , ("y", "http://de.search.yahoo.com/search?p=%s")
+    -- , ("yt", "http://www.youtube.com/results?search_query=%s")
+    -- , ("d", "http://dict.leo.org/?search=%s")
+    -- , ("h", "http://www.haskell.org/hoogle/?hoogle=%s")
+    -- , ("ex", "https://addons.mozilla.org/en-US/firefox/search?q=%s")
+    -- , ("wd", "http://de.wikipedia.org/wiki/Spezial:Search?search=%s")
+    -- , ("w", "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=%s")
+    -- , ("osm", "http://www.openstreetmap.org/?query=%s")
+    -- , ("h", "http://www.haskell.org/hoogle/?hoogle=%s")
+    -- , ("sp", "https://www.startpage.com/do/search?query=%s")
+    -- , ("en", "http://www.encyclo.nl/begrip/%s")
+    -- , ("denl", "http://m.dict.cc/denl/?s=%s")
     ]
 
 -- urbandictionary
