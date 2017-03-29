@@ -43,7 +43,7 @@ mapURL url =
     in do
         query <- lookup "q" nameValues
         (keyword, realQuery) <- splitAtFirstWS query
-        item <- lookup keyword $ lookupConfig nameValues
+        item <- lookup keyword defaultConfig
         return $ subRegex (mkRegex "%s") item (CGI.urlEncode realQuery)
 
 type Config = [(String, String)]
@@ -61,32 +61,15 @@ defaultConfig =
     , ("w", "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=%s")
     , ("osm", "http://www.openstreetmap.org/?query=%s")
     , ("h", "http://www.haskell.org/hoogle/?hoogle=%s")
+    , ("sp", "https://www.startpage.com/do/search?query=%s")
+    , ("en", "http://www.encyclo.nl/begrip/%s")
+    , ("denl", "http://m.dict.cc/denl/?s=%s")
     ]
 
-mklConfig :: Config
-mklConfig =
-    [ ("gh", "https://github.com/search?type=Everything&q=%s")
-    , ("g", "https://duckduckgo.com/html/?q=%s")
-    , ("ft", "http://www.filestube.com/search.html?select=All&q=%s")
-    , ("gd", "http://www.google.de/search?q=%s")
-    , ("dn", "http://www.uitmuntend.de/search.html?search=%s&action=go%21")
-    ] ++ defaultConfig
-
-solConfig :: Config
-solConfig =
-    [ ("g", "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&search=%s")
-    ]
-
--- configs is an association list
-configs :: [(String, Config)]
-configs = [("mkl", mklConfig), ("sol", solConfig)]
-
--- when there is no config with that name in configs, use defaultConfig
-lookupConfig :: [(String, String)] -> Config
-lookupConfig nameValues =
-    case lookup "c" nameValues >>= (flip lookup) configs of
-        Just c -> c
-        Nothing -> defaultConfig
+-- urbandictionary
+-- openstreetmap
+-- dict.cc denl deen
+-- wikipedia de nl en
 
 splitAtFirstWS :: String -> Maybe (String, String)
 splitAtFirstWS s = case break DC.isSpace s of
